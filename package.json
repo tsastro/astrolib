@@ -3,11 +3,14 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Astrometry library",
+  "files": [
+    "src/"
+  ],
   "scripts": {
     "build": "tsc",
-    "test": "jest --watch",
-    "doc": "typedoc src/AstroLib.ts",
-    "eslint": "eslint ."
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "start": "node astrolib.ts",
+    "start:dev": "node -r ts-node/register astrolib.ts"
   },
   "main": "dist/AstroLib.ts",
   "types": "dist/Astrolib.d.ts",
@@ -18,14 +21,15 @@
   "private": false,
   "dependencies": {
     "@buge/ts-units": "^1.2.3",
-    "@tsastro/tsofa": "^18.0.0"
+    "@republicof1/tsofa": "^18.4.1",
+    "common-js": "^0.3.8"
   },
   "devDependencies": {
-    "@eslint/js": "^9.9.1",
+    "@eslint/js": "^8.57.0",
     "@jest/globals": "^29.7.0",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.7.1",
-    "eslint": "^9.9.1",
+    "eslint": "^8.57.0",
     "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-jsdoc": "^46.8.1",
     "eslint-plugin-prefer-arrow": "^1.2.3",
