@@ -8,17 +8,19 @@ const RAD_MIN = -1.57952297307;
 const RAD_MAX = 6.291911955;
 const DEG_MIN = -90.5;
 const DEG_MAX = 360.5;
-const CONV_PRECISION_RD = 10;
-const CONV_PRECISION_SE = 6;
+const CONV_PRECISION_RD = 14;
+const CONV_PRECISION_SE = 10;
 
 //deg in
 export function DegToDms(value: number):string 
 {
-    return ConvertToDMS(ConvertDegToRad(value, CONV_PRECISION_RD), CONV_PRECISION_SE);
+    const rad = ConvertDegToRad(value, CONV_PRECISION_RD);
+    return ConvertToDMS(rad, CONV_PRECISION_SE);
 }
 export function DegToHms(value: number):string 
-{
-    return ConvertToHMS(ConvertDegToRad(value, CONV_PRECISION_RD), CONV_PRECISION_SE);
+{   
+    const rad = ConvertDegToRad(value, CONV_PRECISION_RD);
+    return ConvertToHMS(rad, CONV_PRECISION_SE);
 }
 export function DegToRad(value: number):number 
 {
@@ -59,11 +61,13 @@ export function HmsToRad(value: string):number
 }
 //low priority 
 export function RadToDms(value: number):string {
+    //console.log("R2DMS - in: " + value);
     return ConvertToDMS(value, CONV_PRECISION_SE);
 }
 
 //low priority 
 export function RadToHms(value: number):string {
+    //console.log("R2HMS - in: " + value);
     return ConvertToHMS(value, CONV_PRECISION_SE);
 }
 
@@ -100,7 +104,6 @@ function XXmsToDeg(value: string, mode: string):number
 
         //split on all non digits
         let values: string[] = value.split(/\D/);
-
         //handle negative symbol
         //in the case of RA we elimitate it, for Dec we apply it
         if(value[0] == '-' || value[0] == '+')
@@ -112,7 +115,6 @@ function XXmsToDeg(value: string, mode: string):number
                 //console.log("negative value");
             }
         }
-        
         //if we have 4 components at this stage, handle decimal
         if(values.length == 4)
         {
@@ -120,26 +122,42 @@ function XXmsToDeg(value: string, mode: string):number
             values = values.slice(0,3);
             values[2] += "." + decimal;
         }
-
         //process values - by this point we should be returning good data
         if(values.length == 3)
         {
+            
             out = Number.parseInt(values[0]);
             out += Number.parseInt(values[1]) / 60;
             out += Number.parseFloat(values[2]) / 3600.0;
-        
+            
+            
             if(mode == "RA")
             {
+                //if out of range
+                if(out < 0 || out > 24.0)
+                {
+                    return -111111;
+                }
                 out *= 15;
+
+                if(negative)
+                {
+                    console.log("negative RA detected! Resolving to positive value")
+                }
             }
             else if(mode == "Dec")
             {
+                //if out of range
+                if(out < -90 || out > 90.0)
+                {
+                    return -111111;
+                }
+
                 if(negative)
                 {
                     out *= -1;
                 }
-            }
-            //("gamma: " + out);
+            }         
             return out;
         }
     }
@@ -157,7 +175,8 @@ function ConvertDegToRad(value: number, precision: number):number
     }
     const pm = PrecMod(precision);
     let retval = value * TSOFA.DD2R_$LI$();
-    retval = Math.round((retval + Number.EPSILON)* pm); 
+
+    retval = Math.round((retval + Number.EPSILON) * pm); 
     retval /= pm;
     return retval;
 }
@@ -187,14 +206,11 @@ function ConvertRadToDeg(value: number, precision: number):number
     return retval;
 }
 
-
 function ConvertToDMS(angleRad: number, decimalPrecision: number): string
 {
     let idmsf: number[] = new Array(4);
     const sign: string = TSOFA.jauA2af(decimalPrecision, angleRad, idmsf);
-
     let formated: string = sign + idmsf[0]+" "+idmsf[1]+" "+idmsf[2]+"."+idmsf[3];
-    
     return formated;
 }
 
@@ -202,8 +218,6 @@ function ConvertToHMS(angleRad: number, decimalPrecision: number): string
 {
     let idmsf: number[] = new Array(4);
     const sign: string = TSOFA.jauA2tf(decimalPrecision, angleRad, idmsf);
-
     let formated: string = sign + idmsf[0]+" "+idmsf[1]+" "+idmsf[2]+"."+idmsf[3];
-    
     return formated;
 }

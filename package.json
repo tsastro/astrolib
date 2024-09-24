@@ -1,6 +1,6 @@
 {
   "name": "@tsastro/astrolib",
-  "version": "0.2.4",
+  "version": "0.2.6",
   "type": "module",
   "description": "Astrometry library",
   "files": [
@@ -21,7 +21,7 @@
   "private": false,
   "dependencies": {
     "@buge/ts-units": "^1.2.3",
-    "@republicof1/tsofa": "^18.4.1",
+    "@republicof1/tsofa": "^18.5.0",
     "common-js": "^0.3.8"
   },
   "devDependencies": {

@@ -2,7 +2,7 @@ import exp from "constants";
 import { AstroLib } from "../src/AstroLib.js";
 import { TSOFA } from "@republicof1/tsofa";
 import { convertCompilerOptionsFromJson } from "typescript";
-import { DegToDms } from "../src/AsLi_base.js";
+import { DegToDms, DmsToDeg } from "../src/AsLi_base.js";
 
 /* Validate a double result.
 * 
@@ -44,15 +44,17 @@ function vvf(testValue: number, expectedValue: number){
     }
 }
 
-
-function vv_ms(testValue: string, expectedValue: string){
-
+////////
+// A test to compare sexegesimal components
+// 
+// it breaks each HMS and DMS into H/D M & S and 
+function vv_ms(testValue: string, expectedValue: string, callingFn: string ){
     let gvArr = expectedValue.split(" ");
     let tvArr = testValue.split(" ");
 
-    expect(gvArr[0]).toBe(tvArr[0]);
-    expect(gvArr[1]).toBe(tvArr[1]);
-    expect(Number.parseFloat(gvArr[2])).toBeCloseTo(Number.parseFloat(tvArr[2]))
+    expect(Number.parseInt(gvArr[0])).toBe(Number.parseInt(tvArr[0]));
+    expect(Number.parseInt(gvArr[0])).toBe(Number.parseInt(tvArr[0]));
+    expect(Number.parseFloat(gvArr[2])).toBeCloseTo(Number.parseFloat(tvArr[2]));
 }
 
 //all values confirmed with SIMBAD
@@ -113,25 +115,40 @@ test("Radians to Degrees; pos(3); edge(2); neg(1)",()=> {
 });
 
 test("Degree to HourMinSec; pos(2)", () => {
-    vv_ms(AstroLib.DegToHms(141.0079023718000), "+9 24 1.8965692320");
-    vv_ms(AstroLib.DegToHms(221.7409285236400), "+14 46 57.8228456736");
+    vv_ms(AstroLib.DegToHms(141.0079023718000), "+9 24 1.8965692320", "DEG to HMS 1");
+    vv_ms(AstroLib.DegToHms(221.7409285236400), "+14 46 57.8228456736", "DEG to HMS 2");
 });
 
 test("Degree to DegreeMinSec; pos(2)", () => {
-    vv_ms(AstroLib.DegToDms(+89.26410897), "+89 15 50.79229");
-    vv_ms(AstroLib.DegToDms(-60.8656960707900), "-60 51 56.50585");
+    vv_ms(AstroLib.DegToDms(+89.26410897), "+89 15 50.79229", "DEG to DMS 1");
+    vv_ms(AstroLib.DegToDms(-60.8656960707900), "-60 51 56.50585", "DEG to DMS 2");
 });
 
 test("Radian to HourMinSec; pos(2)", () => {
-    vv_ms(AstroLib.RadToHms(2.461052167719), "+9 24 1.8965692320");
-    vv_ms(AstroLib.RadToHms(3.8701092891669), "+14 46 57.8228456736");
+    vv_ms(AstroLib.RadToHms(2.461052167719), "+9 24 1.8965692320", "RAD to HMS 1");
+    vv_ms(AstroLib.RadToHms(3.8701092891669), "+14 46 57.8228456736", "RAD to HMS 2");
 });
 
 test("Radian to DegreeMinSec; pos(2)", () => {
-    vv_ms(AstroLib.RadToDms(1.557952605), "+89 15 50.79229");
-    vv_ms(AstroLib.RadToDms(-1.062306797953), "-60 51 56.50585");
+    vv_ms(AstroLib.RadToDms(1.557952605), "+89 15 50.79229", "RAD to DMS 1");
+    vv_ms(AstroLib.RadToDms(-1.062306797953), "-60 51 56.50585", "RAD to DMS 2");
 });
 
+test("HMS Round trips", () => {
+    let testVals = ["23 59 49.2197", "11 48 18.2283623", "00 01 1.8965692320"]
+    for(let i = 0; i < testVals.length; ++i)
+    {
+        vv_ms(AstroLib.DegToHms(AstroLib.HmsToDeg(testVals[i])),testVals[i], "DEG to HMS " + i);
+    }
+});
+
+test("DMS Round trips", () => {
+    let testVals = ["-89 01 01.2197234", "0 01 18.2283623", "89 59 1.8965692320"];
+    for(let i = 0; i < testVals.length; ++i)
+    {
+        vv_ms(AstroLib.DegToDms(DmsToDeg(testVals[i])),testVals[i], "DEG to DMS " + i);
+    }
+});
 
 
 // test("Julian date; pos(0)", () => {
