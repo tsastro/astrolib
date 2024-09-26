@@ -18,7 +18,7 @@ jobs:
         with:
           cmd: install # will run `yarn install` command
         env:
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # if needed
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # if needed
       - name: Build production bundle
         uses: borales/actions-yarn@v4
         with:
