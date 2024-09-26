@@ -1,8 +1,6 @@
-import exp from "constants";
-import { AstroLib } from "../src/AstroLib.js";
-import { TSOFA } from "@republicof1/tsofa";
-import { convertCompilerOptionsFromJson } from "typescript";
-import { DegToDms, DmsToDeg } from "../src/AsLi_base.js";
+import { expect, test } from '@jest/globals';
+import { AstroLib } from "../main/AstroLib.js";
+import { DegToDms, DmsToDeg } from "../main/AsLi_base.js";
 
 /* Validate a double result.
 * 
@@ -15,6 +13,7 @@ import { DegToDms, DmsToDeg } from "../src/AsLi_base.js";
 * func     char[]       name of function under test
 * test     char[]       name of individual test
 */
+
 function vvd(testValue: number, expectedValue: number, maxError: number){
     let error: number;
     let errorMag: number;

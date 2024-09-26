@@ -1,19 +1,22 @@
 {
   "name": "@tsastro/astrolib",
-  "version": "0.2.6",
+  "version": "0.1.0",
   "type": "module",
   "description": "Astrometry library",
   "files": [
-    "src/"
+    "dist/"
   ],
   "scripts": {
     "build": "tsc",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test": "jest",
+    "testconf":  "jest --showConfig",
+    "doc": "typedoc src/AstroLib.ts",
+    "eslint": "eslint .",
     "start": "node astrolib.ts",
     "start:dev": "node -r ts-node/register astrolib.ts"
   },
-  "main": "dist/AstroLib.ts",
-  "types": "dist/Astrolib.d.ts",
+  "exports": "./dist/AstroLib.js",
+  "types": "./dist/Astrolib.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/tsastro/astrolib.git"
@@ -21,7 +24,7 @@
   "private": false,
   "dependencies": {
     "@buge/ts-units": "^1.2.3",
-    "@republicof1/tsofa": "^18.5.0",
+    "@tsastro/tsofa": "^18.1.0",
     "common-js": "^0.3.8"
   },
   "devDependencies": {
