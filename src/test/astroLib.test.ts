@@ -121,12 +121,15 @@ test("Degree to HourMinSec; pos(2)", () => {
 test("Degree to DegreeMinSec; pos(2)", () => {
     vv_ms(AstroLib.DegToDms(+89.26410897), "+89 15 50.79229", "DEG to DMS 1");
     vv_ms(AstroLib.DegToDms(-60.8656960707900), "-60 51 56.50585", "DEG to DMS 2");
+    vv_ms(AstroLib.DegToDms(45.0), "45 00 0.0", "DEG to DMS 2");
 });
 
 test("Radian to HourMinSec; pos(2)", () => {
     vv_ms(AstroLib.RadToHms(2.461052167719), "+9 24 1.8965692320", "RAD to HMS 1");
     vv_ms(AstroLib.RadToHms(3.8701092891669), "+14 46 57.8228456736", "RAD to HMS 2");
 });
+
+
 
 test("Radian to DegreeMinSec; pos(2)", () => {
     vv_ms(AstroLib.RadToDms(1.557952605), "+89 15 50.79229", "RAD to DMS 1");
