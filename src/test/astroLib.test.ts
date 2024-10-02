@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals';
 import { AstroLib } from "../main/AstroLib.js";
-import { DegToDms, DmsToDeg } from "../main/AsLi_base.js";
+//import { DegToDms, DmsToDeg } from "../main/AsLi_base.js";
 
 /* Validate a double result.
 * 
@@ -122,6 +122,8 @@ test("Degree to DegreeMinSec; pos(2)", () => {
     vv_ms(AstroLib.DegToDms(+89.26410897), "+89 15 50.79229", "DEG to DMS 1");
     vv_ms(AstroLib.DegToDms(-60.8656960707900), "-60 51 56.50585", "DEG to DMS 2");
     vv_ms(AstroLib.DegToDms(45.0), "45 00 0.0", "DEG to DMS 2");
+    vv_ms(AstroLib.DegToDms(45.000000020304001), "45 00 00.00007309", "DEG to DMS 2");
+    vv_ms(AstroLib.DegToDms(45.020304000000001), "45 01 13.094399999", "DEG to DMS 2");
 });
 
 test("Radian to HourMinSec; pos(2)", () => {
@@ -148,7 +150,7 @@ test("DMS Round trips", () => {
     let testVals = ["-89 01 01.2197234", "0 01 18.2283623", "89 59 1.8965692320"];
     for(let i = 0; i < testVals.length; ++i)
     {
-        vv_ms(AstroLib.DegToDms(DmsToDeg(testVals[i])),testVals[i], "DEG to DMS " + i);
+        vv_ms(AstroLib.DegToDms(AstroLib.DmsToDeg(testVals[i])),testVals[i], "DEG to DMS " + i);
     }
 });
 
