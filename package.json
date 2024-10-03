@@ -1,6 +1,6 @@
 {
   "name": "@tsastro/astrolib",
-  "version": "0.3.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "Astrometry library",
   "files": [
@@ -10,7 +10,7 @@
     "build": "tsc",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "testconf":  "jest --showConfig",
-    "doc": "typedoc src/AstroLib.ts",
+    "doc": "typedoc src/main/AstroLib.ts",
     "eslint": "eslint .",
     "start": "node astrolib.ts",
     "start:dev": "node -r ts-node/register astrolib.ts"
