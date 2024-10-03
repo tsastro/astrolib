@@ -46,14 +46,22 @@ function vvf(testValue: number, expectedValue: number){
 ////////
 // A test to compare sexegesimal components
 // 
-// it breaks each HMS and DMS into H/D M & S and 
+// they are just strings compare as such
 function vv_ms(testValue: string, expectedValue: string, callingFn: string ){
-    let gvArr = expectedValue.split(" ");
-    let tvArr = testValue.split(" ");
+  expect(testValue).toBe(expectedValue);
+}
 
-    expect(Number.parseInt(gvArr[0])).toBe(Number.parseInt(tvArr[0]));
-    expect(Number.parseInt(gvArr[0])).toBe(Number.parseInt(tvArr[0]));
-    expect(Number.parseFloat(gvArr[2])).toBeCloseTo(Number.parseFloat(tvArr[2]));
+function sexagesimalRoundTrip(testValue: string, fwd:(s:string)=>number,rev:(n:number)=>string){
+   const nn = fwd(testValue);
+   const retval = rev(nn);
+   if(!(retval === testValue)){
+       const gvArr = retval.split(" ");
+       const tvArr = testValue.split(" ");
+
+       expect(Number.parseInt(gvArr[0])).toBe(Number.parseInt(tvArr[0]));
+       expect(Number.parseInt(gvArr[0])).toBe(Number.parseInt(tvArr[0]));
+       expect(Number.parseFloat(gvArr[2])).toBeCloseTo(Number.parseFloat(tvArr[2]));
+   }
 }
 
 //all values confirmed with SIMBAD
@@ -114,35 +122,35 @@ test("Radians to Degrees; pos(3); edge(2); neg(1)",()=> {
 });
 
 test("Degree to HourMinSec; pos(2)", () => {
-    vv_ms(AstroLib.DegToHms(141.0079023718000), "+9 24 1.8965692320", "DEG to HMS 1");
-    vv_ms(AstroLib.DegToHms(221.7409285236400), "+14 46 57.8228456736", "DEG to HMS 2");
+    vv_ms(AstroLib.DegToHms(141.0079023718000), "+09 24 01.896569232", "DEG to HMS 1");
+    vv_ms(AstroLib.DegToHms(221.7409285236400), "+14 46 57.822845674", "DEG to HMS 2");
 });
 
 test("Degree to DegreeMinSec; pos(2)", () => {
-    vv_ms(AstroLib.DegToDms(+89.26410897), "+89 15 50.79229", "DEG to DMS 1");
-    vv_ms(AstroLib.DegToDms(-60.8656960707900), "-60 51 56.50585", "DEG to DMS 2");
-    vv_ms(AstroLib.DegToDms(45.0), "45 00 0.0", "DEG to DMS 2");
-    vv_ms(AstroLib.DegToDms(45.000000020304001), "45 00 00.00007309", "DEG to DMS 2");
-    vv_ms(AstroLib.DegToDms(45.020304000000001), "45 01 13.094399999", "DEG to DMS 2");
+    vv_ms(AstroLib.DegToDms(+89.26410897), "+89 15 50.792291999", "DEG to DMS 1");
+    vv_ms(AstroLib.DegToDms(-60.8656960707900), "-60 51 56.505854844", "DEG to DMS 2");
+    vv_ms(AstroLib.DegToDms(45.0), "+45 00 00.000000000", "DEG to DMS 2");
+    vv_ms(AstroLib.DegToDms(45.000000020304001), "+45 00 00.000073094", "DEG to DMS 2");
+    vv_ms(AstroLib.DegToDms(45.020304000000001), "+45 01 13.094399999", "DEG to DMS 2");
 });
 
 test("Radian to HourMinSec; pos(2)", () => {
-    vv_ms(AstroLib.RadToHms(2.461052167719), "+9 24 1.8965692320", "RAD to HMS 1");
-    vv_ms(AstroLib.RadToHms(3.8701092891669), "+14 46 57.8228456736", "RAD to HMS 2");
+    vv_ms(AstroLib.RadToHms(2.461052167719), "+09 24 01.896569237", "RAD to HMS 1");
+    vv_ms(AstroLib.RadToHms(3.8701092891669), "+14 46 57.822845673", "RAD to HMS 2");
 });
 
 
 
 test("Radian to DegreeMinSec; pos(2)", () => {
-    vv_ms(AstroLib.RadToDms(1.557952605), "+89 15 50.79229", "RAD to DMS 1");
-    vv_ms(AstroLib.RadToDms(-1.062306797953), "-60 51 56.50585", "RAD to DMS 2");
+    vv_ms(AstroLib.RadToDms(1.557952605), "+89 15 50.792212484", "RAD to DMS 1");
+    vv_ms(AstroLib.RadToDms(-1.062306797953), "-60 51 56.505854749", "RAD to DMS 2");
 });
 
 test("HMS Round trips", () => {
-    let testVals = ["23 59 49.2197", "11 48 18.2283623", "00 01 1.8965692320"]
+    let testVals = ["23 59 49.219700000", "11 48 18.2283623", "00 01 01.8965692320"]
     for(let i = 0; i < testVals.length; ++i)
     {
-        vv_ms(AstroLib.DegToHms(AstroLib.HmsToDeg(testVals[i])),testVals[i], "DEG to HMS " + i);
+        sexagesimalRoundTrip(testVals[i],AstroLib.HmsToDeg,AstroLib.DegToHms);
     }
 });
 
@@ -150,7 +158,7 @@ test("DMS Round trips", () => {
     let testVals = ["-89 01 01.2197234", "0 01 18.2283623", "89 59 1.8965692320"];
     for(let i = 0; i < testVals.length; ++i)
     {
-        vv_ms(AstroLib.DegToDms(AstroLib.DmsToDeg(testVals[i])),testVals[i], "DEG to DMS " + i);
+        sexagesimalRoundTrip(testVals[i], AstroLib.DmsToDeg, AstroLib.DegToDms);
     }
 });
 
