@@ -10,6 +10,7 @@ import { setMaxIdleHTTPParsers } from "http";
 */
 const CONV_PRECISION_RD = 14;
 const CONV_PRECISION_SE = 9;
+const CONV_PRECISION_JD = 6;
 ///////////////////////////////
 /**
 * Transform position in degrees into degree, arcminute, arcsecond and fraction.
@@ -122,6 +123,24 @@ export function HmsToRad(value: string):number
     }
     return ConvertDegToRad(deg, CONV_PRECISION_RD);
 }
+/**
+ * Generate the Julian Date from Gregorian Date format
+ *
+ */
+export function JulianDate(value: Date):number 
+{
+    let JD = TSOFA.jauCal2jd(value.getFullYear(), value.getMonth(), value.getDate());
+    let JDfrx = TSOFA.jauTf2d('+',value.getHours(),value.getMinutes(),value.getSeconds());
+
+    const pm = PrecMod(CONV_PRECISION_JD);
+    let retval = JDfrx;
+    retval = Math.round((retval + Number.EPSILON) * pm); 
+    retval /= pm;
+    JDfrx = retval;
+
+    return JD.djm0 + JD.djm1 + JDfrx;
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 //  Internal Functions

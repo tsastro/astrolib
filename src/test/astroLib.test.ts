@@ -147,9 +147,12 @@ test("DMS Round trips", () => {
 });
 
 test("Julian date", () => {
-    //07.10.2024 15:46:03.000 UTC
-    //2024.10.07 15:46:03.000 UTC
-    expect(true).toBe(2460591.156979);
+    expect(AstroLib.JulianDate(new Date(2024,10,7,15,46,3,0))).toBe(2460591.156979);
+    expect(AstroLib.JulianDate(new Date(1981,9,27,6,2,15,0))).toBe(2444874.751563);
+    //STS-135
+    expect(AstroLib.JulianDate(new Date(2011,7,8,15,29,4,0))).toBe(2455751.145185);
+    expect(AstroLib.JulianDate(new Date(2000,1,1,0,0,0,0))).toBe(2451544.500000);
+
 });
 
 // test("Julian date; pos(0)", () => {
