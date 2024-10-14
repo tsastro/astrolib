@@ -12,19 +12,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22.x
-
-      - name: Run install
-        uses: borales/actions-yarn@v4
-        with:
-          cmd: install # will run `yarn install` command
+      - run: npm ci
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # if needed
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build production bundle
-        uses: borales/actions-yarn@v4
-        with:
-          cmd: build
-      - name: Test the app
-        uses: borales/actions-yarn@v4
-        with:
-          cmd: test # will run `yarn test` command
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - run: npm test
