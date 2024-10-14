@@ -1,91 +1,180 @@
-
-import { constrainedMemory, loadEnvFile } from "process";
 import {TSOFA} from "@tsastro/tsofa";
 
 // not sure what the best library structure is https://www.typescriptlang.org/docs/handbook/declaration-files/library-structures.html
 
-const RAD_MIN = -1.57952297307;
-const RAD_MAX = 6.291911955;
-const DEG_MIN = -90.5;
-const DEG_MAX = 360.5;
-const CONV_PRECISION_RD = 14;
-const CONV_PRECISION_SE = 10;
 
-//deg in
-export function DegToDms(value: number):string 
+/**
+* Transform position in degrees into degree, arcminute, arcsecond and fraction.
+* @param value the value in degrees.
+ * @param [ndp=9] the number of decimal places returned.
+* Returns undefined if an error occurs
+*/
+export function DegToDms(value: number, ndp: number = 9):string
 {
-    const rad = ConvertDegToRad(value, CONV_PRECISION_RD);
-    return ConvertToDMS(rad, CONV_PRECISION_SE);
+    const rad = ConvertDegToRad(value);
+    return ConvertToDms(rad, ndp);
 }
-export function DegToHms(value: number):string 
+
+/**
+* Transform position in degrees into hours, minutes, seconds and fraction.
+ * @param value the value in degrees.
+ * @param [ndp=9] the number of decimal places returned.
+* Returns undefined if an error occurs
+*/
+export function DegToHms(value: number, ndp: number = 9):string
 {   
-    const rad = ConvertDegToRad(value, CONV_PRECISION_RD);
-    return ConvertToHMS(rad, CONV_PRECISION_SE);
+    const rad = ConvertDegToRad(value);
+    return ConvertToHms(rad, ndp);
 }
+
+/**
+* Convert degrees to radians
+*/
 export function DegToRad(value: number):number 
 {
-    return ConvertDegToRad(value, CONV_PRECISION_RD);
+    return ConvertDegToRad(value);
 }
 
-//sexegesemal in
+/**
+* Transform position in radians into degree, arcminute, arcsecond and fraction.
+ * @param value the value in radians.
+ * @param [ndp=9] the number of decimal places returned.
+* Returns undefined if an error occurs
+*/
+export function RadToDms(value: number, ndp: number = 9):string {
+    //console.log("R2DMS - in: " + value);
+    return ConvertToDms(value, ndp);
+}
+
+/**
+* Transform position in radians into hours, minutes, seconds and fraction.
+* @param value the value in radians.
+* @param [ndp=9] the number of decimal places returned.
+* Returns undefined if an error occurs
+*/
+export function RadToHms(value: number, ndp: number = 9):string {
+    //console.log("R2HMS - in: " + value);
+    return ConvertToHms(value, ndp);
+}
+
+/** 
+* Convert radians to degrees
+*/
+export function RadToDeg(value: number):number 
+{    
+    return ConvertRadToDeg(value);
+}
+
+/**
+* Transform position in degree, arcminute, arcsecond and fraction into degrees.
+* 
+* Returns undefined if an error occurs
+*/
 export function DmsToDeg(value: string):number
 {
     //DMS Degrees, Minutes, Seconds
     return XXmsToDeg(value, "Dec");
 }
 
+/**
+* Transform position in degree, arcminute, arcsecond and fraction into radians
+* 
+* Returns undefined if an error occurs
+*/
 export function DmsToRad(value: string):number 
 {
     const deg = XXmsToDeg(value, "Dec");
-    if(deg == -111111)
+    //if an error has occurred, bail out 
+    if(deg == undefined)
     {
         return deg;    
     }
-    return ConvertDegToRad(deg, CONV_PRECISION_RD);
+    return ConvertDegToRad(deg);
 }
 
+/**
+* Transform position in hours, minutes, seconds and fraction into degrees.
+* 
+* Returns undefined if an error occurs
+*/
 export function HmsToDeg(value: string):number
 {
     //HMS Hours, Minutes, Seconds
     return XXmsToDeg(value, "RA");
 }
 
+/**
+* Transform position in hours, minutes, seconds and fraction into radians.
+* 
+* Returns undefined if an error occurs
+*/
 export function HmsToRad(value: string):number 
 {
     const deg = XXmsToDeg(value, "RA");
-    if(deg == -111111)
+    //if an error has occurred, bail out 
+    if(deg == undefined)
     {
         return deg;    
     }
-    return ConvertDegToRad(deg, CONV_PRECISION_RD);
+    return ConvertDegToRad(deg);
 }
-//low priority 
-export function RadToDms(value: number):string {
-    //console.log("R2DMS - in: " + value);
-    return ConvertToDMS(value, CONV_PRECISION_SE);
-}
+/**
+ * Generate the Julian Date from Gregorian Date format
+ *
+ */
+export function JulianDate(value: Date):number 
+{
+    let JD = TSOFA.jauCal2jd(value.getFullYear(), value.getMonth(), value.getDate());
+    let JDfrx = TSOFA.jauTf2d('+',value.getHours(),value.getMinutes(),value.getSeconds());
 
-//low priority 
-export function RadToHms(value: number):string {
-    //console.log("R2HMS - in: " + value);
-    return ConvertToHMS(value, CONV_PRECISION_SE);
-}
-
-//low priority 
-export function RadToDeg(value: number):number 
-{    
-    return ConvertRadToDeg(value, CONV_PRECISION_RD);
+    return JD.djm0 + JD.djm1 + JDfrx;
 }
 
 
-//////////////////////////////////////////////////////////////////////////
+/**
+ *
+ *  Convert from degrees to radians.
+ */
+export function ConvertDegToRad(value: number):number
+{
+    return value * TSOFA.DD2R_$LI$();
+}
+/**
+ *  Convert from radians to degrees.
+ */
+export function ConvertRadToDeg(value: number):number
+{
+
+    return value * TSOFA.DR2D_$LI$();
+}
+
+
+////////////
 //  Internal Functions
-//////////////////////////////////////////////////////////////////////////
+////////////
 
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-//  This does the heavy lifting of conversion from 
-//  Sexegesimal (RA & Dec) to decimal form
-//
+/**
+ *  Convert angle to Degrees Minutes and Seconds.
+ */
+ function ConvertToDms(angleRad: number, decimalPrecision: number): string
+{
+    return ConvertToXXms(angleRad, decimalPrecision, TSOFA.jauA2af);
+}
+
+/**
+ *  Wrapper for hms calculation and string construction
+ */
+ function ConvertToHms(angleRad: number, decimalPrecision: number): string
+{
+    return ConvertToXXms(angleRad, decimalPrecision, TSOFA.jauA2tf);
+}
+
+/**
+*  This does the heavy lifting of conversion from 
+*  Sexegesimal (RA & Dec) to decimal form
+*  note: there are no out-of-range checks, if desired the caller 
+*  must manage these externally
+*/
 function XXmsToDeg(value: string, mode: string):number
 {
     let out: number;
@@ -125,19 +214,13 @@ function XXmsToDeg(value: string, mode: string):number
         //process values - by this point we should be returning good data
         if(values.length == 3)
         {
-            
             out = Number.parseInt(values[0]);
             out += Number.parseInt(values[1]) / 60;
             out += Number.parseFloat(values[2]) / 3600.0;
             
-            
             if(mode == "RA")
             {
-                //if out of range
-                if(out < 0 || out > 24.0)
-                {
-                    return -111111;
-                }
+                
                 out *= 15;
 
                 if(negative)
@@ -148,11 +231,6 @@ function XXmsToDeg(value: string, mode: string):number
             else if(mode == "Dec")
             {
                 //if out of range
-                if(out < -90 || out > 90.0)
-                {
-                    return -111111;
-                }
-
                 if(negative)
                 {
                     out *= -1;
@@ -162,62 +240,46 @@ function XXmsToDeg(value: string, mode: string):number
         }
     }
     //console.log("non-conformant pattern found");
-    return -111111;
+    return undefined;
 }
 
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-//  Wrapper for Deg >> Rad with precision modifier
-//
-function ConvertDegToRad(value: number, precision: number):number
-{
-    if(value < DEG_MIN || value > DEG_MAX){
-        return -111111;
-    }
-    const pm = PrecMod(precision);
-    let retval = value * TSOFA.DD2R_$LI$();
 
-    retval = Math.round((retval + Number.EPSILON) * pm); 
-    retval /= pm;
-    return retval;
-}
 
-function PrecMod(degree: number): number
+/**
+* >>>>>>>>>>>>>>>>>>>> ConvertToXXms >>>>>>>>>>>>>>>>>>>>>>>>>>
+*  (*)ms calculation and string construction
+*/
+function ConvertToXXms(angleRad: number, decimalPrecision: number, fn: Function): string
 {
-    let output = 1;
-    for(let i = 0; i < degree; ++i)
+    //int representaiton A2tf output array
+    let idmsf = new Array(4);
+    //string representation array output
+    let sdmsf = new Array(4);
+    //get answer components as number array
+    const sign: string = fn(decimalPrecision, angleRad, idmsf);
+    //convert and pad each component:
+    sdmsf[0] = idmsf[0].toString();
+    if(sdmsf[0].length == 1)
     {
-        output *= 10;
+        sdmsf[0] = "0" + sdmsf[0];
     }
-
-    return output;
-}
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-//  Wrapper for Rad >> Deg with precision modifier
-//
-function ConvertRadToDeg(value: number, precision: number):number
-{
-    if(value < RAD_MIN || value > RAD_MAX){
-        return -111111;
+    sdmsf[1] = idmsf[1].toString();
+    if(sdmsf[1].length == 1)
+    {
+        sdmsf[1] = "0" + sdmsf[1];
     }
-    const pm = PrecMod(precision);
-    let retval = value * TSOFA.DR2D_$LI$();
-    retval = Math.round((retval + Number.EPSILON)* pm); 
-    retval /= pm;
-    return retval;
-}
-
-function ConvertToDMS(angleRad: number, decimalPrecision: number): string
-{
-    let idmsf: number[] = new Array(4);
-    const sign: string = TSOFA.jauA2af(decimalPrecision, angleRad, idmsf);
-    let formated: string = sign + idmsf[0]+" "+idmsf[1]+" "+idmsf[2]+"."+idmsf[3];
-    return formated;
-}
-
-function ConvertToHMS(angleRad: number, decimalPrecision: number): string
-{
-    let idmsf: number[] = new Array(4);
-    const sign: string = TSOFA.jauA2tf(decimalPrecision, angleRad, idmsf);
-    let formated: string = sign + idmsf[0]+" "+idmsf[1]+" "+idmsf[2]+"."+idmsf[3];
+    sdmsf[2] = idmsf[2].toString();
+    if(sdmsf[2].length == 1)
+    {
+        sdmsf[2] = "0" + sdmsf[2];
+    }
+    sdmsf[3] = idmsf[3].toString();
+    while(sdmsf[3].length != decimalPrecision)
+    {
+        //lhs padding of precision - extant numbers
+        sdmsf[3] = "0" + sdmsf[3];
+    }
+    //compose and return the string
+    let formated: string = sign + sdmsf[0]+" "+sdmsf[1]+" "+sdmsf[2]+"."+sdmsf[3];
     return formated;
 }
