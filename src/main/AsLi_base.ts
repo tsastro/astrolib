@@ -8,9 +8,7 @@ import { setMaxIdleHTTPParsers } from "http";
 /**
 * Constants
 */
-const CONV_PRECISION_RD = 14;
 const CONV_PRECISION_SE = 9;
-const CONV_PRECISION_JD = 6;
 ///////////////////////////////
 /**
 * Transform position in degrees into degree, arcminute, arcsecond and fraction.
@@ -19,7 +17,7 @@ const CONV_PRECISION_JD = 6;
 */
 export function DegToDms(value: number):string 
 {
-    const rad = ConvertDegToRad(value, CONV_PRECISION_RD);
+    const rad = ConvertDegToRad(value);
     return ConvertToDms(rad, CONV_PRECISION_SE);
 }
 ///////////////////////////////
@@ -30,7 +28,7 @@ export function DegToDms(value: number):string
 */
 export function DegToHms(value: number):string 
 {   
-    const rad = ConvertDegToRad(value, CONV_PRECISION_RD);
+    const rad = ConvertDegToRad(value);
     return ConvertToHms(rad, CONV_PRECISION_SE);
 }
 ///////////////////////////////
@@ -39,7 +37,7 @@ export function DegToHms(value: number):string
 */
 export function DegToRad(value: number):number 
 {
-    return ConvertDegToRad(value, CONV_PRECISION_RD);
+    return ConvertDegToRad(value);
 }
 ///////////////////////////////
 /**
@@ -67,7 +65,7 @@ export function RadToHms(value: number):string {
 */
 export function RadToDeg(value: number):number 
 {    
-    return ConvertRadToDeg(value, CONV_PRECISION_RD);
+    return ConvertRadToDeg(value);
 }
 ///////////////////////////////
 /**
@@ -94,7 +92,7 @@ export function DmsToRad(value: string):number
     {
         return deg;    
     }
-    return ConvertDegToRad(deg, CONV_PRECISION_RD);
+    return ConvertDegToRad(deg);
 }
 ///////////////////////////////
 /**
@@ -121,7 +119,7 @@ export function HmsToRad(value: string):number
     {
         return deg;    
     }
-    return ConvertDegToRad(deg, CONV_PRECISION_RD);
+    return ConvertDegToRad(deg);
 }
 /**
  * Generate the Julian Date from Gregorian Date format
@@ -132,13 +130,26 @@ export function JulianDate(value: Date):number
     let JD = TSOFA.jauCal2jd(value.getFullYear(), value.getMonth(), value.getDate());
     let JDfrx = TSOFA.jauTf2d('+',value.getHours(),value.getMinutes(),value.getSeconds());
 
-    const pm = PrecMod(CONV_PRECISION_JD);
-    let retval = JDfrx;
-    retval = Math.round((retval + Number.EPSILON) * pm); 
-    retval /= pm;
-    JDfrx = retval;
-
     return JD.djm0 + JD.djm1 + JDfrx;
+}
+
+/**
+ *  Convert angle to Degrees Minutes and Seconds.
+ *
+ *
+ */
+export function ConvertToDms(angleRad: number, decimalPrecision: number): string
+{
+    return ConvertToXXms(angleRad, decimalPrecision, TSOFA.jauA2af);
+}
+
+/**
+ * >>>>>>>>>>>>>>>>>>>> ConvertToHms >>>>>>>>>>>>>>>>>>>>>>>>>>
+ *  Wrapper for hms calculation and string construction
+ */
+export function ConvertToHms(angleRad: number, decimalPrecision: number): string
+{
+    return ConvertToXXms(angleRad, decimalPrecision, TSOFA.jauA2tf);
 }
 
 
@@ -219,58 +230,28 @@ function XXmsToDeg(value: string, mode: string):number
     //console.log("non-conformant pattern found");
     return undefined;
 }
-function PrecMod(degree: number): number
-{
-    let output = 1;
-    for(let i = 0; i < degree; ++i)
-    {
-        output *= 10;
-    }
 
-    return output;
-}
 /**
 * >>>>>>>>>>>>>>>>>>>> ConvertDegToRad >>>>>>>>>>>>>>>>>>>>>>>>>>
 *  Wrapper for Deg >> Rad with precision modifier
 */
-function ConvertDegToRad(value: number, precision: number):number
+function ConvertDegToRad(value: number):number
 {
-    const pm = PrecMod(precision);
     let retval = value * TSOFA.DD2R_$LI$();
-    retval = Math.round((retval + Number.EPSILON) * pm); 
-    retval /= pm;
+
     return retval;
 }
 /**
 * >>>>>>>>>>>>>>>>>>>> ConvertRadToDeg >>>>>>>>>>>>>>>>>>>>>>>>>>
 *  Wrapper for Rad >> Deg with precision modifier
 */
-function ConvertRadToDeg(value: number, precision: number):number
+function ConvertRadToDeg(value: number):number
 {
-    const pm = PrecMod(precision);
+
     let retval = value * TSOFA.DR2D_$LI$();
-    retval = Math.round((retval + Number.EPSILON)* pm); 
-    retval /= pm;
     return retval;
 }
 
-/**
-* >>>>>>>>>>>>>>>>>>>> ConvertToDms >>>>>>>>>>>>>>>>>>>>>>>>>>
-*  Wrapper for dms calculation and string construction
-*/
-function ConvertToDms(angleRad: number, decimalPrecision: number): string
-{
-    return ConvertToXXms(angleRad, decimalPrecision, TSOFA.jauA2af);
-}
-
-/**
-* >>>>>>>>>>>>>>>>>>>> ConvertToHms >>>>>>>>>>>>>>>>>>>>>>>>>>
-*  Wrapper for hms calculation and string construction
-*/
-function ConvertToHms(angleRad: number, decimalPrecision: number): string
-{
-    return ConvertToXXms(angleRad, decimalPrecision, TSOFA.jauA2tf);
-}
 
 /**
 * >>>>>>>>>>>>>>>>>>>> ConvertToXXms >>>>>>>>>>>>>>>>>>>>>>>>>>

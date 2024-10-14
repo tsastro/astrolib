@@ -2,7 +2,7 @@ import { expect, test } from '@jest/globals';
 import { AstroLib } from "../main/AstroLib.js";
 //import { DegToDms, DmsToDeg } from "../main/AsLi_base.js";
 
-/* Validate a double result.
+/** Validate a double result.
 * 
 * Internal function used by most test's below.
 * 
@@ -111,11 +111,11 @@ test("Degree to HourMinSec; pos(2)", () => {
 });
 
 test("Degree to DegreeMinSec; pos(2)", () => {
-    expect(AstroLib.DegToDms(+89.26410897)).toBe("+89 15 50.792291999");
+    expect(AstroLib.DegToDms(+89.26410897)).toBe("+89 15 50.792292000");
     expect(AstroLib.DegToDms(-60.8656960707900)).toBe("-60 51 56.505854844");
     expect(AstroLib.DegToDms(45.0)).toBe("+45 00 00.000000000");
     expect(AstroLib.DegToDms(45.000000020304001)).toBe("+45 00 00.000073094");
-    expect(AstroLib.DegToDms(45.020304000000001)).toBe("+45 01 13.094399999");
+    expect(AstroLib.DegToDms(45.020304000000001)).toBe("+45 01 13.094400000");
 });
 
 test("Radian to HourMinSec; pos(2)", () => {
@@ -147,11 +147,11 @@ test("DMS Round trips", () => {
 });
 
 test("Julian date", () => {
-    expect(AstroLib.JulianDate(new Date(2024,10,7,15,46,3,0))).toBe(2460591.156979);
-    expect(AstroLib.JulianDate(new Date(1981,9,27,6,2,15,0))).toBe(2444874.751563);
+    vvd(AstroLib.JulianDate(new Date(2024,10,7,15,46,3,0)),2460591.156979,1e-6);
+    vvd(AstroLib.JulianDate(new Date(1981,9,27,6,2,15,0)),2444874.751563,1e-6);
     //STS-135
-    expect(AstroLib.JulianDate(new Date(2011,7,8,15,29,4,0))).toBe(2455751.145185);
-    expect(AstroLib.JulianDate(new Date(2000,1,1,0,0,0,0))).toBe(2451544.500000);
+    vvd(AstroLib.JulianDate(new Date(2011,7,8,15,29,4,0)),2455751.145185,1e-6);
+    vvd(AstroLib.JulianDate(new Date(2000,1,1,0,0,0,0)),2451544.500000,1e-10);
 
 });
 
