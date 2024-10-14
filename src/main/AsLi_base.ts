@@ -1,37 +1,32 @@
-
-import { constrainedMemory, loadEnvFile } from "process";
 import {TSOFA} from "@tsastro/tsofa";
-import { setMaxIdleHTTPParsers } from "http";
 
 // not sure what the best library structure is https://www.typescriptlang.org/docs/handbook/declaration-files/library-structures.html
-//////////////////////////////
-/**
-* Constants
-*/
-const CONV_PRECISION_SE = 9;
-///////////////////////////////
+
+
 /**
 * Transform position in degrees into degree, arcminute, arcsecond and fraction.
-* 
+* @param value the value in degrees.
+ * @param [ndp=9] the number of decimal places returned.
 * Returns undefined if an error occurs
 */
-export function DegToDms(value: number):string 
+export function DegToDms(value: number, ndp: number = 9):string
 {
     const rad = ConvertDegToRad(value);
-    return ConvertToDms(rad, CONV_PRECISION_SE);
+    return ConvertToDms(rad, ndp);
 }
-///////////////////////////////
+
 /**
 * Transform position in degrees into hours, minutes, seconds and fraction.
-* 
+ * @param value the value in degrees.
+ * @param [ndp=9] the number of decimal places returned.
 * Returns undefined if an error occurs
 */
-export function DegToHms(value: number):string 
+export function DegToHms(value: number, ndp: number = 9):string
 {   
     const rad = ConvertDegToRad(value);
-    return ConvertToHms(rad, CONV_PRECISION_SE);
+    return ConvertToHms(rad, ndp);
 }
-///////////////////////////////
+
 /**
 * Convert degrees to radians
 */
@@ -39,27 +34,29 @@ export function DegToRad(value: number):number
 {
     return ConvertDegToRad(value);
 }
-///////////////////////////////
+
 /**
 * Transform position in radians into degree, arcminute, arcsecond and fraction.
-* 
+ * @param value the value in radians.
+ * @param [ndp=9] the number of decimal places returned.
 * Returns undefined if an error occurs
 */
-export function RadToDms(value: number):string {
+export function RadToDms(value: number, ndp: number = 9):string {
     //console.log("R2DMS - in: " + value);
-    return ConvertToDms(value, CONV_PRECISION_SE);
+    return ConvertToDms(value, ndp);
 }
-///////////////////////////////
+
 /**
 * Transform position in radians into hours, minutes, seconds and fraction.
-* 
+* @param value the value in radians.
+* @param [ndp=9] the number of decimal places returned.
 * Returns undefined if an error occurs
 */
-export function RadToHms(value: number):string {
+export function RadToHms(value: number, ndp: number = 9):string {
     //console.log("R2HMS - in: " + value);
-    return ConvertToHms(value, CONV_PRECISION_SE);
+    return ConvertToHms(value, ndp);
 }
-///////////////////////////////
+
 /** 
 * Convert radians to degrees
 */
@@ -67,7 +64,7 @@ export function RadToDeg(value: number):number
 {    
     return ConvertRadToDeg(value);
 }
-///////////////////////////////
+
 /**
 * Transform position in degree, arcminute, arcsecond and fraction into degrees.
 * 
@@ -78,7 +75,7 @@ export function DmsToDeg(value: string):number
     //DMS Degrees, Minutes, Seconds
     return XXmsToDeg(value, "Dec");
 }
-///////////////////////////////
+
 /**
 * Transform position in degree, arcminute, arcsecond and fraction into radians
 * 
@@ -94,7 +91,7 @@ export function DmsToRad(value: string):number
     }
     return ConvertDegToRad(deg);
 }
-///////////////////////////////
+
 /**
 * Transform position in hours, minutes, seconds and fraction into degrees.
 * 
@@ -105,7 +102,7 @@ export function HmsToDeg(value: string):number
     //HMS Hours, Minutes, Seconds
     return XXmsToDeg(value, "RA");
 }
-///////////////////////////////
+
 /**
 * Transform position in hours, minutes, seconds and fraction into radians.
 * 
@@ -133,31 +130,46 @@ export function JulianDate(value: Date):number
     return JD.djm0 + JD.djm1 + JDfrx;
 }
 
+
+/**
+ *
+ *  Convert from degrees to radians.
+ */
+export function ConvertDegToRad(value: number):number
+{
+    return value * TSOFA.DD2R_$LI$();
+}
+/**
+ *  Convert from radians to degrees.
+ */
+export function ConvertRadToDeg(value: number):number
+{
+
+    return value * TSOFA.DR2D_$LI$();
+}
+
+
+////////////
+//  Internal Functions
+////////////
+
 /**
  *  Convert angle to Degrees Minutes and Seconds.
- *
- *
  */
-export function ConvertToDms(angleRad: number, decimalPrecision: number): string
+ function ConvertToDms(angleRad: number, decimalPrecision: number): string
 {
     return ConvertToXXms(angleRad, decimalPrecision, TSOFA.jauA2af);
 }
 
 /**
- * >>>>>>>>>>>>>>>>>>>> ConvertToHms >>>>>>>>>>>>>>>>>>>>>>>>>>
  *  Wrapper for hms calculation and string construction
  */
-export function ConvertToHms(angleRad: number, decimalPrecision: number): string
+ function ConvertToHms(angleRad: number, decimalPrecision: number): string
 {
     return ConvertToXXms(angleRad, decimalPrecision, TSOFA.jauA2tf);
 }
 
-
-//////////////////////////////////////////////////////////////////////////
-//  Internal Functions
-//////////////////////////////////////////////////////////////////////////
 /**
-* >>>>>>>>>>>>>>>>>>>> XXmsToDeg >>>>>>>>>>>>>>>>>>>>>>>>>>
 *  This does the heavy lifting of conversion from 
 *  Sexegesimal (RA & Dec) to decimal form
 *  note: there are no out-of-range checks, if desired the caller 
@@ -231,26 +243,6 @@ function XXmsToDeg(value: string, mode: string):number
     return undefined;
 }
 
-/**
-* >>>>>>>>>>>>>>>>>>>> ConvertDegToRad >>>>>>>>>>>>>>>>>>>>>>>>>>
-*  Wrapper for Deg >> Rad with precision modifier
-*/
-function ConvertDegToRad(value: number):number
-{
-    let retval = value * TSOFA.DD2R_$LI$();
-
-    return retval;
-}
-/**
-* >>>>>>>>>>>>>>>>>>>> ConvertRadToDeg >>>>>>>>>>>>>>>>>>>>>>>>>>
-*  Wrapper for Rad >> Deg with precision modifier
-*/
-function ConvertRadToDeg(value: number):number
-{
-
-    let retval = value * TSOFA.DR2D_$LI$();
-    return retval;
-}
 
 
 /**
@@ -282,7 +274,7 @@ function ConvertToXXms(angleRad: number, decimalPrecision: number, fn: Function)
         sdmsf[2] = "0" + sdmsf[2];
     }
     sdmsf[3] = idmsf[3].toString();
-    while(sdmsf[3].length != CONV_PRECISION_SE)
+    while(sdmsf[3].length != decimalPrecision)
     {
         //lhs padding of precision - extant numbers
         sdmsf[3] = "0" + sdmsf[3];
